@@ -5,6 +5,7 @@ import me.mastergamercz.bedwars.chat.ChatUtil;
 import me.mastergamercz.bedwars.commands.BedWarsCommand;
 import me.mastergamercz.bedwars.commands.TeamCommand;
 import me.mastergamercz.bedwars.commands.VoteCommand;
+import me.mastergamercz.bedwars.enums.GameStatus;
 import me.mastergamercz.bedwars.enums.GenType;
 import me.mastergamercz.bedwars.enums.StatType;
 import me.mastergamercz.bedwars.enums.Team;
@@ -67,6 +68,7 @@ public class Main extends JavaPlugin {
     private ArrayList<Location> villagers = new ArrayList<Location>();
     private ItemShop itemShop;
     private RestartGameTask restartGameTask;
+    private GameStatus gameStatus;
 
     public void onEnable() {
          configManager = new ConfigManager(this);
@@ -85,6 +87,7 @@ public class Main extends JavaPlugin {
 
 
          motd = configManager.getConfig("config.yml").getBoolean("enableMotd", true);
+         setGameStatus(GameStatus.LOBBY);
 
          setPrefix(ChatColor.translateAlternateColorCodes('&', getConfigManager().getConfig("messages.yml").getString("prefix")));
          databaseManager.setup();
@@ -93,7 +96,6 @@ public class Main extends JavaPlugin {
          reset();
 
     }
-
 
     public void reset() {
         sb.resetScoreboard(ChatColor.GOLD + "Voting" + ChatColor.WHITE + " | " + ChatColor.GOLD + "/vote <name>");
@@ -354,6 +356,14 @@ public class Main extends JavaPlugin {
 
     public void onDisable() {
 
+    }
+
+    public void setGameStatus(GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
     }
 
     public StatsManager getStatsManager() {

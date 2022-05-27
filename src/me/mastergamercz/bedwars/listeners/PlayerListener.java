@@ -3,6 +3,7 @@ package me.mastergamercz.bedwars.listeners;
 import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.PlayerMeta;
 import me.mastergamercz.bedwars.chat.ChatUtil;
+import me.mastergamercz.bedwars.enums.GameStatus;
 import me.mastergamercz.bedwars.enums.StatType;
 import me.mastergamercz.bedwars.enums.Team;
 import me.mastergamercz.bedwars.utils.Board;
@@ -61,6 +62,10 @@ public class PlayerListener implements Listener {
                         String.valueOf(getPlayers(Team.GREEN)));
                 motd = motd.replaceAll("%PLAYERS%",
                         String.valueOf(Bukkit.getOnlinePlayers().size()));
+                motd = motd.replaceAll("%GAMESTATUS%",
+                        String.valueOf(instance.getGameStatus().getColor() + instance.getGameStatus().toString()));
+                motd = motd.replaceAll("%MAP%",
+                        String.valueOf(instance.getVotingManager().getWinner()));
 
                 e.setMotd(ChatColor.translateAlternateColorCodes('§', motd));
             } catch (Exception ex) {
@@ -225,6 +230,9 @@ public class PlayerListener implements Listener {
             player.getInventory().clear();
             giveLobbyItems(player);
             player.teleport(instance.getMapManager().getLobbySpawnPoint());
+            if (Bukkit.getOnlinePlayers().size() == instance.getConfigManager().getConfig("config.yml").getInt("min-players")) {
+                instance.getStartGameTask().runTaskTimer(instance, 0,20);
+            }
 
 
             instance.getScoreboardHandler().update();
