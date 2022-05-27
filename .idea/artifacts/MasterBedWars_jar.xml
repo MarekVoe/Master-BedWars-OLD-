@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MasterBedWars:jar">
+    <output-path>$USER_HOME$/Desktop/Servers/Minigame1/plugins</output-path>
+    <root id="archive" name="MasterBedWars.jar">
+      <element id="module-output" name="MasterBedWars" />
+      <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+    </root>
+  </artifact>
+</component>

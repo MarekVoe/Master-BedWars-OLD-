@@ -1,0 +1,11 @@
+name: Masters-BedWars
+author: mastergamerCz
+version: 1.1
+main: me.mastergamercz.bedwars.Main
+commands:
+  bw:
+    description: Basic functions
+  team:
+    description: Team command
+  vote:
+    description: Voting command
