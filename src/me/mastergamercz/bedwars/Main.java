@@ -47,7 +47,6 @@ import java.util.UUID;
 
 public class Main extends JavaPlugin {
 
-
     private String prefix;
     private ConfigManager configManager;
     private MapManager mapManager;
@@ -57,15 +56,14 @@ public class Main extends JavaPlugin {
     private DatabaseManager databaseManager;
     public boolean hasStarted = false;
     private StartGameTask startGameTask;
-    private ArrayList<Location> placedBlocks = new ArrayList<Location>();
     public boolean motd = true;
     private ArrayList<Location> bronzes = new ArrayList<Location>();
     private ArrayList<Location> irons = new ArrayList<Location>();
     private ArrayList<Location> golds = new ArrayList<Location>();
     private StatsManager statsManager;
     private WorldUtils worldUtils;
-    private ArrayList <UUID> admins = new ArrayList<UUID>();
     private ArrayList<Location> villagers = new ArrayList<Location>();
+    private ArrayList<UUID> admins = new ArrayList<UUID>();
     private ItemShop itemShop;
     private RestartGameTask restartGameTask;
     private GameStatus gameStatus;
@@ -98,7 +96,7 @@ public class Main extends JavaPlugin {
     }
 
     public void reset() {
-        sb.resetScoreboard(ChatColor.GOLD + "Voting" + ChatColor.WHITE + " | " + ChatColor.GOLD + "/vote <name>");
+        getScoreboardHandler().setLobbyScoreboard();
         mapManager.reset();
         PlayerMeta.reset();
 
@@ -402,15 +400,11 @@ public class Main extends JavaPlugin {
         return soundManager;
     }
 
-    public ArrayList<Location> getPlacedBlocks() {
-        return placedBlocks;
+    public ItemShop getItemShop() {
+        return itemShop;
     }
 
     public ArrayList<UUID> getAdmins() {
         return admins;
-    }
-
-    public ItemShop getItemShop() {
-        return itemShop;
     }
 }

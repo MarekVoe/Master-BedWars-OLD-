@@ -79,7 +79,7 @@ public class VotingManager {
         return maps;
     }
 
-    private int countVotes(String map) {
+    public int countVotes(String map) {
         int total = 0;
         for (String vote : votes.values())
             if (vote.equals(map))
@@ -91,6 +91,10 @@ public class VotingManager {
         for (String map : maps.values()) {
             plugin.getScoreboardHandler().teams.get(map).setSuffix(ChatColor.WHITE + " » " + ChatColor.GOLD + countVotes(map) + " Vote" + (countVotes(map) == 1 ? "" : "s"));
         }
+    }
+
+    public HashMap<String, String> getVotes() {
+        return votes;
     }
 }
 

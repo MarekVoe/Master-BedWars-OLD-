@@ -11,6 +11,8 @@ import me.mastergamercz.bedwars.utils.Util;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -33,7 +35,9 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class PlayerListener implements Listener {
 
@@ -92,10 +96,6 @@ public class PlayerListener implements Listener {
         Player player = e.getPlayer();
         Block block = e.getBlock();
 
-        if (instance.getPlacedBlocks().contains(block.getLocation())) {
-            e.setCancelled(false);
-        }
-
         if (e.getBlock().getType() == Material.BED || e.getBlock().getType() != Material.BED_BLOCK) {
             e.setCancelled(true);
         } else if (e.getBlock().getType() == Material.BED || e.getBlock().getType() != Material.BED_BLOCK && instance.getAdmins().contains(player.getUniqueId())) {
@@ -138,8 +138,6 @@ public class PlayerListener implements Listener {
         map.setScore(9);
         null1.setScore(8);
         null2.setScore(0);
-
-
 
        int size = 6;
 
@@ -251,10 +249,17 @@ public class PlayerListener implements Listener {
         ItemStack teamSelector = new ItemStack(Material.BANNER);
         ItemMeta teamMeta = teamSelector.getItemMeta();
 
+        ItemStack maps = new ItemStack(Material.BOOK);
+        ItemMeta mapsMeta = maps.getItemMeta();
+
+        mapsMeta.setDisplayName(ChatColor.GOLD + "Vote for map");
+        maps.setItemMeta(mapsMeta);
+
         teamMeta.setDisplayName(ChatColor.WHITE + "Team Selector");
         teamSelector.setItemMeta(teamMeta);
 
         inv.addItem(teamSelector);
+        inv.addItem(maps);
     }
 
     @EventHandler
@@ -264,7 +269,34 @@ public class PlayerListener implements Listener {
         if (player.getWorld().getName().equalsIgnoreCase("lobby") && player.getItemInHand().getType().equals(Material.BANNER)) {
             e.setCancelled(true);
             openTeamSelector(player);
+        } else if (player.getWorld().getName().equalsIgnoreCase("lobby") && player.getItemInHand().getType().equals(Material.BOOK)) {
+            e.setCancelled(true);
+            openMapVoter(player);
         }
+    }
+
+    public void openMapVoter(Player player) {
+        Inventory inv = Bukkit.createInventory(null, 9, ChatColor.GOLD + "" + ChatColor.BOLD + "Maps");
+
+        int size = -1;
+        ItemStack paper = new ItemStack(Material.PAPER);
+        ItemMeta paperMeta = paper.getItemMeta();
+        List<String> lore = new ArrayList<String>();
+        paperMeta.setLore(lore);
+
+        for (String name : instance.getMapManager().getRandomMaps()) {
+            size++;
+            if (instance.getVotingManager().countVotes(name) > 1 || instance.getVotingManager().countVotes(name) == 0) {
+                lore.add(ChatColor.WHITE + String.valueOf(instance.getVotingManager().countVotes(name)) + ChatColor.translateAlternateColorCodes('&', " &6Votes"));
+            } else if (instance.getVotingManager().countVotes(name) == 1) {
+                lore.add(ChatColor.WHITE + String.valueOf(instance.getVotingManager().countVotes(name)) + ChatColor.translateAlternateColorCodes('&', " &6Vote"));
+            }
+            paperMeta.setDisplayName(name);
+            paperMeta.setLore(lore);
+            paper.setItemMeta(paperMeta);
+            inv.setItem(size, paper);
+        }
+        player.openInventory(inv);
     }
 
     public void openTeamSelector(Player player) {
@@ -320,6 +352,13 @@ public class PlayerListener implements Listener {
                 player.closeInventory();
             } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.YELLOW + "Yellow Team")) {
                 player.performCommand("team yellow");
+                e.setCancelled(true);
+                player.closeInventory();
+            }
+        } else if (player.getWorld().getName().equalsIgnoreCase("lobby") && inv.getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Maps")) {
+            FileConfiguration config = instance.getConfigManager().getConfig("maps.yml");
+            if (config.contains(clickedItem.getItemMeta().getDisplayName())) {
+                Bukkit.dispatchCommand(player, "vote " + clickedItem.getItemMeta().getDisplayName());
                 e.setCancelled(true);
                 player.closeInventory();
             }
@@ -419,8 +458,6 @@ public class PlayerListener implements Listener {
 
         if (player.getWorld().getName().equalsIgnoreCase("lobby")) {
             e.setCancelled(true);
-        } else {
-         instance.getPlacedBlocks().add(e.getBlock().getLocation());
         }
     }
 }
