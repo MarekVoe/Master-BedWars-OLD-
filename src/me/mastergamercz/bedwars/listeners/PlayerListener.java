@@ -242,6 +242,7 @@ public class PlayerListener implements Listener {
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
 
+        PlayerMeta.getMeta(player).setTeam(Team.NONE);
         e.setQuitMessage(instance.getPrefix() + " " + ChatColor.GOLD + player.getName() + ChatColor.DARK_GRAY + " has joined the game.");
     }
 
