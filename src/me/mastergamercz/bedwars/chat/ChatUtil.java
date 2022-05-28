@@ -61,9 +61,9 @@ public class ChatUtil {
         Team victimTeam = PlayerMeta.getMeta(victim).getTeam();
         String victimColor = victimTeam != null ? victimTeam.color().toString()
                 : ChatColor.DARK_PURPLE.toString();
-        String victimName = victimColor + victim.getName() + ChatColor.GRAY;
+        String victimName = victimColor + victim.getName() + ChatColor.DARK_GRAY;
 
-        String message = ChatColor.GRAY + original;
+        String message = ChatColor.DARK_GRAY + original;
         message = message.replace(victim.getName(), victimName);
 
         if (message.contains(" �8�")) {
