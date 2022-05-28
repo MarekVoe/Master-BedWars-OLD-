@@ -68,6 +68,15 @@ public enum Team {
         return new Team[] {RED, YELLOW, GREEN, BLUE};
     }
 
+    public boolean isFull() {
+        if (getPlayers().size() == 4) {
+            return true;
+        } else if (getPlayers().size() < 4) {
+            return false;
+        }
+        return false;
+    }
+
     public Color getColor(Team team) {
         switch (team) {
             case GREEN:

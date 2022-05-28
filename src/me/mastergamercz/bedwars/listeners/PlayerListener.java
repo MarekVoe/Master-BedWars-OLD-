@@ -23,6 +23,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
@@ -122,13 +123,13 @@ public class PlayerListener implements Listener {
              instance.getStatsManager().setStatType(StatType.BEDS_DESTROYED, breaker);
              instance.checkWin();
 
-      instance.getScoreboardHandler().scores.clear();
-      instance.getScoreboardHandler().teams.clear();
+             instance.getScoreboardHandler().scores.clear();
+             instance.getScoreboardHandler().teams.clear();
 
-        instance.getScoreboardHandler().sb = Bukkit.getScoreboardManager().getNewScoreboard();
-        instance.getScoreboardHandler().obj = instance.getScoreboardHandler().sb.registerNewObjective("bedwars", "dummy");
-        instance.getScoreboardHandler().obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        instance.getScoreboardHandler().obj.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "BedWars");
+             instance.getScoreboardHandler().sb = Bukkit.getScoreboardManager().getNewScoreboard();
+             instance.getScoreboardHandler().obj = instance.getScoreboardHandler().sb.registerNewObjective("bedwars", "dummy");
+             instance.getScoreboardHandler().obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+             instance.getScoreboardHandler().obj.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "BedWars");
 
 
         Score map = instance.getScoreboardHandler().obj.getScore(ChatColor.DARK_GRAY + "Map: " + ChatColor.GOLD + instance.getVotingManager().getWinner());
@@ -299,27 +300,71 @@ public class PlayerListener implements Listener {
         player.openInventory(inv);
     }
 
+    @EventHandler
+    public void onFoodChange(FoodLevelChangeEvent e) {
+        Player player = (Player) e.getEntity();
+        e.setCancelled(true);
+        player.setFoodLevel(20);
+    }
+
     public void openTeamSelector(Player player) {
         Inventory inv = Bukkit.createInventory(null, 9, "Team Selector");
         ItemStack redTeam = new ItemStack(Material.WOOL, 1, (short) 14);
         ItemMeta redMeta = redTeam.getItemMeta();
         redMeta.setDisplayName(ChatColor.RED + "Red Team");
+        List<String> redLore = new ArrayList<String>();
+        for (Player players : Bukkit.getOnlinePlayers()) {
+            if (PlayerMeta.getMeta(players).getTeam() == Team.RED) {
+                redLore.add(String.valueOf(ChatColor.RED + players.getName()));
+            }
+        }
+
+        redMeta.setLore(redLore);
         redTeam.setItemMeta(redMeta);
 
         ItemStack blueTeam = new ItemStack(Material.WOOL, 1, (short) 11);
         ItemMeta blueMeta = blueTeam.getItemMeta();
         blueMeta.setDisplayName(ChatColor.BLUE + "Blue Team");
+        List<String> blueLore = new ArrayList<String>();
+
+        for (Player players : Bukkit.getOnlinePlayers()) {
+          if (PlayerMeta.getMeta(players).getTeam() == Team.BLUE) {
+              blueLore.add(String.valueOf(ChatColor.BLUE + players.getName()));
+          }
+        }
+
+        blueMeta.setLore(blueLore);
         blueTeam.setItemMeta(blueMeta);
 
-        ItemStack greenTeam = new ItemStack(Material.WOOL, 1, (short) 13);
-        ItemMeta greenMeta = greenTeam.getItemMeta();;
-        greenMeta.setDisplayName(ChatColor.GREEN + "Green Team");
-        greenTeam.setItemMeta(greenMeta);
 
+        ItemStack greenTeam = new ItemStack(Material.WOOL, 1, (short) 13);
+        ItemMeta greenMeta = greenTeam.getItemMeta();
+        greenMeta.setDisplayName(ChatColor.GREEN + "Green Team");
+        List<String> greenLore = new ArrayList<String>();
+
+        for (Player players : Bukkit.getOnlinePlayers()) {
+            if (PlayerMeta.getMeta(players).getTeam() == Team.GREEN) {
+                greenLore.add(String.valueOf(ChatColor.GREEN + players.getName()));
+            }
+        }
+
+
+        greenMeta.setLore(greenLore);
+        greenTeam.setItemMeta(greenMeta);
 
         ItemStack yellowTeam = new ItemStack(Material.WOOL, 1, (short) 4);
         ItemMeta yellowMeta = yellowTeam.getItemMeta();
         yellowMeta.setDisplayName(ChatColor.YELLOW + "Yellow Team");
+        List<String> yellowLore = new ArrayList<String>();
+
+
+        for (Player players : Bukkit.getOnlinePlayers()) {
+            if (PlayerMeta.getMeta(players).getTeam() == Team.YELLOW) {
+                yellowLore.add(String.valueOf(ChatColor.YELLOW + players.getName()));
+            }
+        }
+
+        yellowMeta.setLore(yellowLore);
         yellowTeam.setItemMeta(yellowMeta);
 
 
@@ -406,6 +451,10 @@ public class PlayerListener implements Listener {
         yellowTeam.setScore(1);
         null5.setScore(0);
 
+        instance.getScoreboardHandler().setTeam(Team.BLUE);
+        instance.getScoreboardHandler().setTeam(Team.RED);
+        instance.getScoreboardHandler().setTeam(Team.GREEN);
+        instance.getScoreboardHandler().setTeam(Team.YELLOW);
         player.setScoreboard(sb);
     }
 
@@ -435,11 +484,15 @@ public class PlayerListener implements Listener {
         } else if (inv.getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Shop")) {
             e.setCancelled(true);
             if (item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Blocks")) {
-                 // TODO
+
             } else if (item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Tools")) {
-                // TODO
+
             }
         }
+    }
+
+    public void addBlocksShop(Inventory inventory) {
+
     }
 
     @EventHandler

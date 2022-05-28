@@ -21,6 +21,7 @@ import me.mastergamercz.bedwars.tasks.RestartGameTask;
 import me.mastergamercz.bedwars.tasks.StartGameTask;
 import me.mastergamercz.bedwars.utils.Util;
 import me.mastergamercz.bedwars.utils.WorldUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -159,37 +160,50 @@ public class Main extends JavaPlugin {
       }
       hasStarted = true;
 
-        org.bukkit.scoreboard.ScoreboardManager sbm = Bukkit.getScoreboardManager();
-        Scoreboard sb = sbm.getNewScoreboard();
+        getScoreboardHandler().scores.clear();
+        getScoreboardHandler().teams.clear();
 
-        Objective obj = sb.registerNewObjective("bwgame", "dummy");
+        getScoreboardHandler().sb = Bukkit.getScoreboardManager().getNewScoreboard();
+        getScoreboardHandler().obj = getScoreboardHandler().sb.registerNewObjective("bedwars", "dummy");
+        getScoreboardHandler().obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+        getScoreboardHandler().obj.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "BedWars");
 
-        obj.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "BedWars");
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        Score map = obj.getScore(ChatColor.DARK_GRAY + "Map: " + ChatColor.GOLD + votingManager.getWinner());
-        Score null1 = obj.getScore("");
-        Score blueTeam = obj.getScore(ChatColor.DARK_GRAY + "(" + ChatColor.WHITE + Team.BLUE.getPlayers().size() + ChatColor.DARK_GRAY + ") " + ChatColor.RED + "\u2764 " + ChatColor.BLUE + "Blue Team");
-        Score null2 = obj.getScore(" ");
-        Score redTeam = obj.getScore(ChatColor.DARK_GRAY + "(" + ChatColor.WHITE + Team.RED.getPlayers().size() + ChatColor.DARK_GRAY + ") " + ChatColor.RED + "\u2764 Red Team");
-        Score null3 = obj.getScore("  ");
-        Score greenTeam = obj.getScore(ChatColor.DARK_GRAY + "(" + ChatColor.WHITE + Team.GREEN.getPlayers().size() + ChatColor.DARK_GRAY + ") " + ChatColor.RED + "\u2764 " + ChatColor.GREEN + "Green Team");
-        Score null4 = obj.getScore("   ");
-        Score yellowTeam = obj.getScore(ChatColor.DARK_GRAY + "(" + ChatColor.WHITE + Team.YELLOW.getPlayers().size() + ChatColor.DARK_GRAY + ") " + ChatColor.RED + "\u2764 " + ChatColor.YELLOW + "Yellow Team");
-        Score null5 = obj.getScore("    ");
+        Score map = getScoreboardHandler().obj.getScore(ChatColor.DARK_GRAY + "Map: " + ChatColor.GOLD + getVotingManager().getWinner());
+        Score null1 = getScoreboardHandler().obj.getScore("");
+        Score null2 = getScoreboardHandler().obj.getScore(" ");
 
         map.setScore(9);
         null1.setScore(8);
-        blueTeam.setScore(6);
-        redTeam.setScore(4);
-        greenTeam.setScore(2);
-        yellowTeam.setScore(1);
-        null5.setScore(0);
+        null2.setScore(0);
 
-        for (Player players : Bukkit.getOnlinePlayers()) {
-            players.setScoreboard(sb);
+        int size = 6;
+
+        for (Team teams : Team.teams()) {
+            size--;
+            if (teams.getTeamBed().isAlive()) {
+                getScoreboardHandler().scores.put(teams.name(), getScoreboardHandler().obj.getScore(ChatColor.DARK_GRAY + "(" + ChatColor.WHITE + teams.getPlayers().size() + ChatColor.DARK_GRAY + ") " + ChatColor.RED + "\u2764 " + teams.getColor() + WordUtils.capitalize(teams.name().toLowerCase() + " Team")));
+                getScoreboardHandler().scores.get(teams.name()).setScore(size);
+            }
         }
 
+        getScoreboardHandler().setTeam(Team.BLUE);
+        getScoreboardHandler().setTeam(Team.RED);
+        getScoreboardHandler().setTeam(Team.GREEN);
+        getScoreboardHandler().setTeam(Team.YELLOW);
+        getScoreboardHandler().update();
+
+        for (Player players : Bukkit.getOnlinePlayers()) {
+            if (PlayerMeta.getMeta(players).getTeam() == Team.BLUE) {
+                getScoreboardHandler().teams.get(Team.BLUE.toString().toUpperCase()).addPlayer(players);
+            } else if (PlayerMeta.getMeta(players).getTeam() == Team.RED) {
+               getScoreboardHandler().teams.get(Team.RED.toString().toUpperCase()).addPlayer(players);
+            } else if (PlayerMeta.getMeta(players).getTeam() == Team.YELLOW) {
+                getScoreboardHandler().teams.get(Team.YELLOW.toString().toUpperCase()).addPlayer(players);
+            } else if (PlayerMeta.getMeta(players).getTeam() == Team.GREEN) {
+                getScoreboardHandler().teams.get(Team.GREEN.toString().toUpperCase()).addPlayer(players);
+            }
+        }
     }
 
 
@@ -291,34 +305,13 @@ public class Main extends JavaPlugin {
             target = Team.valueOf(team.toUpperCase());
         } catch (IllegalArgumentException e) {
             player.sendMessage(prefix + ChatColor.RED + "Team, you want to join doesn't exist!");
-            listTeams(player);
             return;
         }
 
         player.sendMessage(prefix + ChatColor.DARK_GRAY + "Joined team " + target.coloredName());
         playerMeta.setTeam(target);
 
-    }
-
-    public void listTeams(CommandSender sender) {
-        sender.sendMessage(ChatColor.DARK_GRAY + "============[" + ChatColor.GOLD + "Teams" + ChatColor.DARK_GRAY + "]============");
-        for (Team t : Team.teams()) {
-            int size = 0;
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                PlayerMeta meta = PlayerMeta.getMeta(player);
-                if (meta.getTeam() == t)
-                    size++;
-            }
-
-            if (size != 1) {
-                sender.sendMessage(t.coloredName() + " - " + size + " " + ("INFO_TEAM_LIST_PLAYERS") + ("DYNAMIC_S"));
-            } else {
-                sender.sendMessage(t.coloredName() + " - " + size + " " + ("INFO_TEAM_LIST_PLAYERS"));
-            }
-            sender.sendMessage(ChatColor.GRAY + "===============================");
-
-        }
+        getScoreboardHandler().teams.get(team.toUpperCase()).addPlayer(player);
     }
 
     public void checkWin() {

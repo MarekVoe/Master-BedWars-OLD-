@@ -23,7 +23,7 @@ public class ChatUtil {
         String msg = message;
         // Todo Vault Hook
 
-        String toSend = group + " " + username + ChatColor.RESET + ": " + msg;
+        String toSend = group + " " + username + ChatColor.GOLD + " " + ChatColor.BOLD +  "> " +  ChatColor.RESET + msg;
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendMessage(toSend);
         }
@@ -34,7 +34,7 @@ public class ChatUtil {
 
         group = (ChatColor.DARK_GRAY + "[" + team.color() + team.toString() + ChatColor.DARK_GRAY + "]");
 
-        String toSend = group + " " + team.color() + sender.getName() + ChatColor.RESET + ": " + message;
+        String toSend = group + " " + team.color() + sender.getName() + ChatColor.GOLD + " " + ChatColor.BOLD + "> " + ChatColor.RESET + message;
         for (Player player : team.getPlayers())
             player.sendMessage(toSend);
     }

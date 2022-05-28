@@ -4,6 +4,7 @@ import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.enums.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -73,6 +74,11 @@ public class ScoreboardManager {
             teams.get(map).setPrefix(ChatColor.GOLD + "" + count + ". " + ChatColor.WHITE);
         }
 
+        setTeam(Team.BLUE);
+        setTeam(Team.RED);
+        setTeam(Team.GREEN);
+        setTeam(Team.YELLOW);
+
         update();
     }
 
@@ -105,6 +111,8 @@ public class ScoreboardManager {
         sbt.setAllowFriendlyFire(false);
         sbt.setCanSeeFriendlyInvisibles(true);
         sbt.setPrefix(t.color().toString());
+
+
     }
 }
 
