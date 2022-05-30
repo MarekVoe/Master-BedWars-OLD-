@@ -32,7 +32,6 @@ public class Bronze_ItemGenerator extends BukkitRunnable {
             if (genType == GenType.BRONZE) {
                 if (plugin.hasStarted) {
                     location.getWorld().dropItem(location, new ItemStack(Material.CLAY_BRICK,1));
-                    plugin.getServer().getConsoleSender().sendMessage(plugin.getPrefix() + ChatColor.BLUE + "Item spawned");
                     time = timeX;
                 }
             }

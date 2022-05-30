@@ -1,5 +1,6 @@
 package me.mastergamercz.bedwars;
 
+import me.mastergamercz.bedwars.enums.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -20,8 +21,7 @@ public class ItemShop implements Listener {
         this.plugin = plugin;
     }
 
-       public void openShop(Player player) {
-        int size = 9;
+       public void openShop(Player player, int size) {
         String title = (ChatColor.GOLD + "" + ChatColor.BOLD + "Shop");
         Inventory inv = Bukkit.createInventory(player,size, title);
         addCategories(player, inv);
@@ -89,5 +89,42 @@ public class ItemShop implements Listener {
         specialShop.setItemMeta(specialMeta);
 
         inv.addItem(blockShop, armorShop, toolShop, weaponShop, bowShop, chestShop, potionShop, specialShop);
+     }
+
+
+     public void addBlocks(Player player, Inventory inventory) {
+
+        ItemStack wool = new ItemStack(Material.WOOL, 2, (short) 0);
+
+        if (PlayerMeta.getMeta(player).getTeam() == Team.BLUE) {
+            wool = new ItemStack(Material.WOOL, 2, (short) 11);
+        } else if (PlayerMeta.getMeta(player).getTeam() == Team.RED) {
+            wool = new ItemStack(Material.WOOL, 2, (short) 14);
+        } else if (PlayerMeta.getMeta(player).getTeam() == Team.YELLOW) {
+            wool = new ItemStack(Material.WOOL, 2, (short) 4);
+        } else if (PlayerMeta.getMeta(player).getTeam() == Team.GREEN) {
+            wool = new ItemStack(Material.WOOL, 2, (short) 13);
+        }
+
+        inventory.setItem(9, wool);
+     }
+
+     public void buy(Player player, ItemStack toBuy, ItemStack costItem, int amount) {
+          Material type = toBuy.getType();
+          switch (type) {
+              case WOOL:
+                  if (player.getInventory().contains(costItem, 1)) {
+                      player.getInventory().removeItem(new ItemStack(costItem.getType(), 1));
+                      player.getInventory().addItem(new ItemStack(toBuy.getType(), amount));
+                  } else {
+                    player.closeInventory();
+                    player.sendMessage(plugin.getPrefix() + ChatColor.RED + "You dont have enough materials to buy this.");
+                  }
+              break;
+
+              case SANDSTONE:
+
+              break;
+          }
      }
 }

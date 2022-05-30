@@ -32,7 +32,6 @@ public class Iron_ItemGenerator extends BukkitRunnable {
             if (genType == GenType.IRON) {
                 if (plugin.hasStarted) {
                     location.getWorld().dropItem(location, new ItemStack(Material.IRON_INGOT,1));
-                    plugin.getServer().getConsoleSender().sendMessage(plugin.getPrefix() + ChatColor.BLUE + "Item spawned");
                     time = timeX;
                 }
             }

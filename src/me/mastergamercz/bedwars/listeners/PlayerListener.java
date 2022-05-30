@@ -374,35 +374,38 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInventoryInteract(InventoryClickEvent e) {
         Player player = (Player) e.getWhoClicked();
-        Inventory inv = e.getInventory();
         ItemStack clickedItem = e.getCurrentItem();
 
-        if (player.getWorld().getName().equalsIgnoreCase("lobby") && inv.getName().equalsIgnoreCase("Team Selector")) {
-            if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Red Team")) {
-                player.performCommand("team red");
-                e.setCancelled(true);
-                player.closeInventory();
-            } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.BLUE + "Blue Team")) {
-                player.performCommand("team blue");
-                e.setCancelled(true);
-                player.closeInventory();
-            } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Green Team")) {
-                player.performCommand("team green");
-                e.setCancelled(true);
-                player.closeInventory();
-            } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.YELLOW + "Yellow Team")) {
-                player.performCommand("team yellow");
-                e.setCancelled(true);
-                player.closeInventory();
-            }
-        } else if (player.getWorld().getName().equalsIgnoreCase("lobby") && inv.getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Maps")) {
-            FileConfiguration config = instance.getConfigManager().getConfig("maps.yml");
-            if (config.contains(clickedItem.getItemMeta().getDisplayName())) {
-                Bukkit.dispatchCommand(player, "vote " + clickedItem.getItemMeta().getDisplayName());
-                e.setCancelled(true);
-                player.closeInventory();
-            }
-        }
+         e.setCancelled(true);
+
+         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+         if (e.getInventory().getName().equalsIgnoreCase("Team Selector")) {
+             if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.RED + "Red Team")) {
+                 player.performCommand("team red");
+                 e.setCancelled(true);
+                 player.closeInventory();
+             } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.BLUE + "Blue Team")) {
+                 player.performCommand("team blue");
+                 e.setCancelled(true);
+                 player.closeInventory();
+             } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GREEN + "Green Team")) {
+                 player.performCommand("team green");
+                 e.setCancelled(true);
+                 player.closeInventory();
+             } else if (clickedItem.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.YELLOW + "Yellow Team")) {
+                 player.performCommand("team yellow");
+                 e.setCancelled(true);
+                 player.closeInventory();
+             }
+         } else if (e.getInventory().getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Maps")) {
+             FileConfiguration config = instance.getConfigManager().getConfig("maps.yml");
+             if (config.contains(clickedItem.getItemMeta().getDisplayName())) {
+                 Bukkit.dispatchCommand(player, "vote " + clickedItem.getItemMeta().getDisplayName());
+                 e.setCancelled(true);
+                 player.closeInventory();
+             }
+         }
     }
 
     @EventHandler
@@ -411,7 +414,7 @@ public class PlayerListener implements Listener {
         Villager villager = (Villager) e.getRightClicked();
         if (e.getRightClicked().getType().equals(EntityType.VILLAGER)) {
             e.setCancelled(true);
-              instance.getItemShop().openShop(player);
+              instance.getItemShop().openShop(player, 27);
               System.out.println(player.getName() + " Interacted with villager");
         } else {
             player.sendMessage(ChatColor.RED + "This is not a villager");
@@ -477,17 +480,13 @@ public class PlayerListener implements Listener {
         if (inv == player.getInventory()) {
             e.setCancelled(false);
         } else if (inv.getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Shop")) {
-            e.setCancelled(true);
-            if (item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Blocks")) {
-
-            } else if (item.getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Tools")) {
-
+            if (item.getType() == Material.SANDSTONE) {
+                instance.getItemShop().addBlocks(player, inv);
+            } else if (item.getType() == Material.WOOL) {
+                  instance.getItemShop().buy(player, item, new ItemStack(Material.CLAY_BRICK,1), 2);
             }
+          e.setCancelled(true);
         }
-    }
-
-    public void addBlocksShop(Inventory inventory) {
-
     }
 
     @EventHandler

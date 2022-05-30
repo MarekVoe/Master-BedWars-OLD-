@@ -32,7 +32,6 @@ public class Gold_ItemGenerator extends BukkitRunnable {
             if (genType == GenType.GOLD) {
                 if (plugin.hasStarted) {
                     location.getWorld().dropItem(location, new ItemStack(Material.GOLD_INGOT,1));
-                    plugin.getServer().getConsoleSender().sendMessage(plugin.getPrefix() + ChatColor.BLUE + "Item spawned");
                     time = timeX;
                 }
             }
