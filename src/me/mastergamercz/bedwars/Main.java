@@ -68,6 +68,7 @@ public class Main extends JavaPlugin {
     private ItemShop itemShop;
     private RestartGameTask restartGameTask;
     private GameStatus gameStatus;
+    private ArrayList<Location> placedBlocks = new ArrayList<Location>();
 
     public void onEnable() {
          configManager = new ConfigManager(this);
@@ -90,6 +91,8 @@ public class Main extends JavaPlugin {
 
          setPrefix(ChatColor.translateAlternateColorCodes('&', getConfigManager().getConfig("messages.yml").getString("prefix")));
          databaseManager.setup();
+         itemShop.init();
+
          registerCommands();
          registerListeners();
          reset();
@@ -130,6 +133,8 @@ public class Main extends JavaPlugin {
 
            Bukkit.getScheduler().cancelAllTasks();
            PlayerMeta.reset();
+           mapManager.reset();
+           placedBlocks.clear();
         for (Entity e : Bukkit.getWorld(votingManager.getWinner()).getEntities()) {
             e.remove();
         }
@@ -399,5 +404,9 @@ public class Main extends JavaPlugin {
 
     public ArrayList<UUID> getAdmins() {
         return admins;
+    }
+
+    public ArrayList<Location> getPlacedBlocks() {
+        return placedBlocks;
     }
 }

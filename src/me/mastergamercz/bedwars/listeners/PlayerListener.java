@@ -3,12 +3,15 @@ package me.mastergamercz.bedwars.listeners;
 import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.PlayerMeta;
 import me.mastergamercz.bedwars.chat.ChatUtil;
+import me.mastergamercz.bedwars.enums.DropdownType;
 import me.mastergamercz.bedwars.enums.StatType;
 import me.mastergamercz.bedwars.enums.Team;
+import net.minecraft.server.v1_8_R3.Village;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -17,14 +20,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -91,11 +97,12 @@ public class PlayerListener implements Listener {
         Player player = e.getPlayer();
         Block block = e.getBlock();
 
-        if (e.getBlock().getType() == Material.BED || e.getBlock().getType() != Material.BED_BLOCK) {
+
+        if (!instance.getPlacedBlocks().contains(e.getBlock().getLocation())) {
             e.setCancelled(true);
-        } else if (e.getBlock().getType() == Material.BED || e.getBlock().getType() != Material.BED_BLOCK && instance.getAdmins().contains(player.getUniqueId())) {
-           e.setCancelled(false);
-        } else {
+        } else if (instance.getPlacedBlocks().contains(e.getBlock().getLocation())) {
+            e.setCancelled(false);
+        }
             for (Team team : Team.teams()) {
                 if (team.getTeamBed().getLocation().equals(e.getBlock().getLocation()) || team.getTeamBed().getLocation().distance(e.getBlock().getLocation()) <= 3) {
                     final Team attacker = PlayerMeta.getMeta(player).getTeam();
@@ -104,11 +111,11 @@ public class PlayerListener implements Listener {
                         player.sendMessage(ChatColor.RED + "You cannot destroy your own bed !");
                     } else {
                         breakBed(team, player);
+                        e.getBlock().setType(Material.AIR);
                     }
                 }
             }
         }
-    }
 
     public void breakBed(final Team victim, Player breaker) {
          final Team attacker = PlayerMeta.getMeta(breaker).getTeam();
@@ -161,6 +168,16 @@ public class PlayerListener implements Listener {
                     e.getEntity().teleport(instance.getMapManager().getLobbySpawnPoint());
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onDamageEntity(EntityDamageByEntityEvent e) {
+        Entity entity = e.getEntity();
+
+        if (entity instanceof Villager) {
+            e.setCancelled(true);
+            e.setDamage(0.0);
         }
     }
 
@@ -376,7 +393,11 @@ public class PlayerListener implements Listener {
         Player player = (Player) e.getWhoClicked();
         ItemStack clickedItem = e.getCurrentItem();
 
-         e.setCancelled(true);
+         if (e.getClickedInventory() instanceof PlayerInventory && !player.getWorld().getName().equalsIgnoreCase("lobby")) {
+             e.setCancelled(false);
+         } else {
+             e.setCancelled(true);
+         }
 
          if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
@@ -405,6 +426,19 @@ public class PlayerListener implements Listener {
                  e.setCancelled(true);
                  player.closeInventory();
              }
+
+         } else if (e.getInventory().getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Shop")) {
+             player.playSound(player.getLocation(), Sound.CLICK, 1,1);
+             if (e.getSlot() == 0) {
+                 instance.getItemShop().dropDown(player, DropdownType.BLOCKS, e.getInventory());
+             } else if (e.getSlot() == 9) {
+                 if (e.getClick() == ClickType.LEFT) {
+                     instance.getItemShop().buy(player, clickedItem, instance.getItemShop().getBronze(), 1);
+                 } else if (e.getClick()== ClickType.SHIFT_LEFT) {
+                     instance.getItemShop().shiftBuy(player, clickedItem, instance.getItemShop().getBronze(), 1);
+                 }
+                 System.out.println(player.getName() + " buying " + clickedItem.getType());
+             }
          }
     }
 
@@ -416,8 +450,6 @@ public class PlayerListener implements Listener {
             e.setCancelled(true);
               instance.getItemShop().openShop(player, 27);
               System.out.println(player.getName() + " Interacted with villager");
-        } else {
-            player.sendMessage(ChatColor.RED + "This is not a villager");
         }
     }
 
@@ -468,24 +500,8 @@ public class PlayerListener implements Listener {
         Player player = e.getPlayer();
         if (player.getWorld().getName().equalsIgnoreCase("lobby")) {
             e.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void inventoryClick(InventoryClickEvent e) {
-        Player player = (Player) e.getWhoClicked();
-        Inventory inv = e.getClickedInventory();
-        ItemStack item = e.getCurrentItem();
-
-        if (inv == player.getInventory()) {
+        } else {
             e.setCancelled(false);
-        } else if (inv.getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Shop")) {
-            if (item.getType() == Material.SANDSTONE) {
-                instance.getItemShop().addBlocks(player, inv);
-            } else if (item.getType() == Material.WOOL) {
-                  instance.getItemShop().buy(player, item, new ItemStack(Material.CLAY_BRICK,1), 2);
-            }
-          e.setCancelled(true);
         }
     }
 
@@ -505,6 +521,8 @@ public class PlayerListener implements Listener {
 
         if (player.getWorld().getName().equalsIgnoreCase("lobby")) {
             e.setCancelled(true);
+        } else {
+            instance.getPlacedBlocks().add(e.getBlock().getLocation());
         }
     }
 }

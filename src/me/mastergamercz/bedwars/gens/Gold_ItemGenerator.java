@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Gold_ItemGenerator extends BukkitRunnable {
@@ -28,10 +29,16 @@ public class Gold_ItemGenerator extends BukkitRunnable {
 
     @Override
     public void run() {
+        ItemStack gold = new ItemStack(Material.GOLD_INGOT);
+        ItemMeta goldMeta = gold.getItemMeta();
+
+        goldMeta.setDisplayName(ChatColor.YELLOW + "" + ChatColor.BOLD + "Gold");
+        gold.setItemMeta(goldMeta);
+
         if (time <= 0) {
             if (genType == GenType.GOLD) {
                 if (plugin.hasStarted) {
-                    location.getWorld().dropItem(location, new ItemStack(Material.GOLD_INGOT,1));
+                    location.getWorld().dropItem(location, gold);
                     time = timeX;
                 }
             }

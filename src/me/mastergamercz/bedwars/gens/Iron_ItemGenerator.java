@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Iron_ItemGenerator extends BukkitRunnable {
@@ -28,10 +29,17 @@ public class Iron_ItemGenerator extends BukkitRunnable {
 
     @Override
     public void run() {
+
+        ItemStack iron = new ItemStack(Material.IRON_INGOT);
+        ItemMeta ironMeta = iron.getItemMeta();
+
+        ironMeta.setDisplayName(ChatColor.GRAY + "" + ChatColor.BOLD + "Iron");
+        iron.setItemMeta(ironMeta);
+
         if (time <= 0) {
             if (genType == GenType.IRON) {
                 if (plugin.hasStarted) {
-                    location.getWorld().dropItem(location, new ItemStack(Material.IRON_INGOT,1));
+                    location.getWorld().dropItem(location, iron);
                     time = timeX;
                 }
             }
