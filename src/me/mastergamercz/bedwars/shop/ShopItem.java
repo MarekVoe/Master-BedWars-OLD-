@@ -92,9 +92,6 @@ public class ShopItem extends MenuItem {
 
         itemMeta.setLore(itemLore);
         revampedItem.setItemMeta(itemMeta);
-        System.out.println("Item: " + item.getType().toString());
-        System.out.println("Price Item: " + price.getType().toString());
-        System.out.println("Revamped Item: " + revampedItem.getType().toString());
         return revampedItem;
 
 

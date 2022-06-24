@@ -3,6 +3,8 @@ package me.mastergamercz.bedwars.utils;
 import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.PlayerMeta;
 import org.bukkit.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -44,5 +46,17 @@ public class Util {
                 player.sendMessage(plugin.getPrefix() + ChatColor.DARK_GRAY + "You are now " + ChatColor.GOLD + "vulnerable");
             }
         }, 3L);
+    }
+
+
+    public static ArmorStand spawnStand(Location location) {
+        ArmorStand stand = (ArmorStand) location.getWorld().spawnEntity(location, EntityType.ARMOR_STAND);
+
+        stand.setGravity(false);
+        stand.setVisible(false);
+        stand.setBasePlate(false);
+        stand.setCustomNameVisible(true);
+
+        return stand;
     }
 }

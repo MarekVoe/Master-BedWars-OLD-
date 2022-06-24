@@ -70,6 +70,7 @@ public class Main extends JavaPlugin {
     private GameStatus gameStatus;
     private ArrayList<Location> placedBlocks = new ArrayList<Location>();
     private ArrayList<UUID> vulnerable = new ArrayList<UUID>();
+    private ItemManager itemManager;
 
     public void onEnable() {
          configManager = new ConfigManager(this);
@@ -84,6 +85,7 @@ public class Main extends JavaPlugin {
          this.databaseManager = new DatabaseManager(this);
          this.statsManager = new StatsManager(this);
          this.worldUtils = new WorldUtils();
+         this.itemManager = new ItemManager();
 
          motd = configManager.getConfig("config.yml").getBoolean("enableMotd", true);
          setGameStatus(GameStatus.LOBBY);
@@ -405,5 +407,9 @@ public class Main extends JavaPlugin {
 
     public ArrayList<UUID> getVulnerable() {
         return vulnerable;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 }
