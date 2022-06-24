@@ -2,8 +2,7 @@ package me.mastergamercz.bedwars.utils;
 
 import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.PlayerMeta;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -37,5 +36,13 @@ public class Util {
             player.teleport(playerMeta.getTeam().getRandomSpawn());
             player.getInventory().clear();
         }
+
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override
+            public void run(){
+                plugin.getVulnerable().remove(player.getUniqueId());
+                player.sendMessage(plugin.getPrefix() + ChatColor.DARK_GRAY + "You are now " + ChatColor.GOLD + "vulnerable");
+            }
+        }, 3L);
     }
 }

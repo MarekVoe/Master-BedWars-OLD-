@@ -2,10 +2,7 @@ package me.mastergamercz.bedwars.enums;
 
 import me.mastergamercz.bedwars.PlayerMeta;
 import me.mastergamercz.bedwars.TeamBed;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -13,18 +10,25 @@ import java.util.List;
 import java.util.Random;
 
 public enum Team {
-    RED,YELLOW,BLUE,GREEN,NONE;
+    RED(DyeColor.RED),
+    YELLOW(DyeColor.YELLOW),
+    BLUE(DyeColor.BLUE),
+    GREEN(DyeColor.GREEN),
+    NONE(DyeColor.WHITE);
 
     private final ChatColor color;
     private List<Location> spawns;
     private TeamBed teamBed;
+    private DyeColor dyeColor;
 
-    Team() {
+    Team(DyeColor dyeColor) {
         if (name().equals("NONE"))
             color = ChatColor.WHITE;
         else
             color = ChatColor.valueOf(name());
 
+
+        this.dyeColor = dyeColor;
         spawns = new ArrayList<Location>();
     }
 
@@ -110,5 +114,9 @@ public enum Team {
 
     public ChatColor color() {
         return color;
+    }
+
+    public DyeColor getDyeColor() {
+        return dyeColor;
     }
 }

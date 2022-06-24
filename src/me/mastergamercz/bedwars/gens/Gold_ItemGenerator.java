@@ -38,7 +38,7 @@ public class Gold_ItemGenerator extends BukkitRunnable {
         if (time <= 0) {
             if (genType == GenType.GOLD) {
                 if (plugin.hasStarted) {
-                    location.getWorld().dropItem(location, gold);
+                    location.getWorld().dropItem(location, Resource.GOLD.getItem());
                     time = timeX;
                 }
             }

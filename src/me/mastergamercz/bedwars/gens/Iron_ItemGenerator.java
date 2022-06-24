@@ -39,7 +39,7 @@ public class Iron_ItemGenerator extends BukkitRunnable {
         if (time <= 0) {
             if (genType == GenType.IRON) {
                 if (plugin.hasStarted) {
-                    location.getWorld().dropItem(location, iron);
+                    location.getWorld().dropItem(location, Resource.IRON.getItem());
                     time = timeX;
                 }
             }

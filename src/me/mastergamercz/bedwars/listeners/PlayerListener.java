@@ -2,11 +2,12 @@ package me.mastergamercz.bedwars.listeners;
 
 import me.mastergamercz.bedwars.Main;
 import me.mastergamercz.bedwars.PlayerMeta;
+import me.mastergamercz.bedwars.UI.Menu;
 import me.mastergamercz.bedwars.chat.ChatUtil;
-import me.mastergamercz.bedwars.enums.DropdownType;
 import me.mastergamercz.bedwars.enums.StatType;
 import me.mastergamercz.bedwars.enums.Team;
-import net.minecraft.server.v1_8_R3.Village;
+import me.mastergamercz.bedwars.shop.Category;
+import me.mastergamercz.bedwars.shop.ShopMenu;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -106,10 +107,10 @@ public class PlayerListener implements Listener {
             for (Team team : Team.teams()) {
                 if (team.getTeamBed().getLocation().equals(e.getBlock().getLocation()) || team.getTeamBed().getLocation().distance(e.getBlock().getLocation()) <= 3) {
                     final Team attacker = PlayerMeta.getMeta(player).getTeam();
-                    if (team == attacker) {
+                    if (team == attacker && e.getBlock().getType() == Material.BED || team == attacker && e.getBlock().getType() == Material.BED_BLOCK) {
                         e.setCancelled(true);
                         player.sendMessage(ChatColor.RED + "You cannot destroy your own bed !");
-                    } else {
+                    } else if (team != attacker && e.getBlock().getType() == Material.BED || team != attacker && e.getBlock().getType() == Material.BED_BLOCK) {
                         breakBed(team, player);
                         e.getBlock().setType(Material.AIR);
                     }
@@ -151,6 +152,24 @@ public class PlayerListener implements Listener {
            }
        }
 
+
+       instance.getScoreboardHandler().setTeam(Team.BLUE);
+       instance.getScoreboardHandler().setTeam(Team.RED);
+       instance.getScoreboardHandler().setTeam(Team.YELLOW);
+       instance.getScoreboardHandler().setTeam(Team.GREEN);
+
+       for (Player p : Bukkit.getOnlinePlayers()) {
+           if (PlayerMeta.getMeta(p).getTeam() == Team.BLUE) {
+               instance.getScoreboardHandler().teams.get(Team.BLUE.toString().toUpperCase()).addPlayer(p);
+           } else if (PlayerMeta.getMeta(p).getTeam() == Team.RED) {
+               instance.getScoreboardHandler().teams.get(Team.RED.toString().toUpperCase()).addPlayer(p);
+           } else if (PlayerMeta.getMeta(p).getTeam() == Team.GREEN) {
+               instance.getScoreboardHandler().teams.get(Team.GREEN.toString().toUpperCase()).addPlayer(p);
+           } else if (PlayerMeta.getMeta(p).getTeam() == Team.YELLOW) {
+               instance.getScoreboardHandler().teams.get(Team.YELLOW.toString().toUpperCase()).addPlayer(p);
+           }
+       }
+
        instance.getScoreboardHandler().update();
 
         for (Player players : Bukkit.getOnlinePlayers()) {
@@ -160,6 +179,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
+
         if (e.getEntity() instanceof Player) {
             if (e.getEntity().getWorld().getName().equalsIgnoreCase("lobby")) {
                 e.setCancelled(true);
@@ -167,9 +187,14 @@ public class PlayerListener implements Listener {
                 if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
                     e.getEntity().teleport(instance.getMapManager().getLobbySpawnPoint());
                 }
+            } else if (instance.getVulnerable().contains(e.getEntity().getUniqueId()) && e.getEntity() instanceof Player) {
+                    e.setCancelled(true);
+                } else {
+                    e.setCancelled(false);
+                }
             }
         }
-    }
+
 
     @EventHandler
     public void onDamageEntity(EntityDamageByEntityEvent e) {
@@ -215,6 +240,8 @@ public class PlayerListener implements Listener {
         instance.getStatsManager().loadStats(player);
 
         instance.getScoreboardHandler().setLobbyScoreboard();
+
+        instance.getVulnerable().add(player.getUniqueId());
 
         if (instance.hasStarted && !player.hasPermission("bedwars.join.bypass")) {
             player.kickPlayer(ChatColor.RED + "Game has started. If you want to spectate, purchase " + ChatColor.GOLD + "" + ChatColor.BOLD + "Premium");
@@ -426,19 +453,6 @@ public class PlayerListener implements Listener {
                  e.setCancelled(true);
                  player.closeInventory();
              }
-
-         } else if (e.getInventory().getName().equalsIgnoreCase(ChatColor.GOLD + "" + ChatColor.BOLD + "Shop")) {
-             player.playSound(player.getLocation(), Sound.CLICK, 1,1);
-             if (e.getSlot() == 0) {
-                 instance.getItemShop().dropDown(player, DropdownType.BLOCKS, e.getInventory());
-             } else if (e.getSlot() == 9) {
-                 if (e.getClick() == ClickType.LEFT) {
-                     instance.getItemShop().buy(player, clickedItem, instance.getItemShop().getBronze(), 1);
-                 } else if (e.getClick()== ClickType.SHIFT_LEFT) {
-                     instance.getItemShop().shiftBuy(player, clickedItem, instance.getItemShop().getBronze(), 1);
-                 }
-                 System.out.println(player.getName() + " buying " + clickedItem.getType());
-             }
          }
     }
 
@@ -448,7 +462,8 @@ public class PlayerListener implements Listener {
         Villager villager = (Villager) e.getRightClicked();
         if (e.getRightClicked().getType().equals(EntityType.VILLAGER)) {
             e.setCancelled(true);
-              instance.getItemShop().openShop(player, 27);
+            Menu shop = new ShopMenu(instance.getMapManager().getCurrentMap(), player, Category.BLOCKS);
+            shop.open();
               System.out.println(player.getName() + " Interacted with villager");
         }
     }

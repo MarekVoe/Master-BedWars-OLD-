@@ -39,7 +39,7 @@ public class Bronze_ItemGenerator extends BukkitRunnable {
         if (time <= 0) {
             if (genType == GenType.BRONZE) {
                 if (plugin.hasStarted) {
-                    location.getWorld().dropItem(location,bronze);
+                    location.getWorld().dropItem(location, Resource.BRONZE.getItem());
                     time = timeX;
                 }
             }

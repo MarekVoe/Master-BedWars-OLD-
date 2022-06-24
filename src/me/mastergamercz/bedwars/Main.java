@@ -13,6 +13,7 @@ import me.mastergamercz.bedwars.gens.Bronze_ItemGenerator;
 import me.mastergamercz.bedwars.gens.Gold_ItemGenerator;
 import me.mastergamercz.bedwars.gens.Iron_ItemGenerator;
 import me.mastergamercz.bedwars.listeners.EntityListener;
+import me.mastergamercz.bedwars.listeners.MenuListeners;
 import me.mastergamercz.bedwars.listeners.PlayerListener;
 import me.mastergamercz.bedwars.listeners.WorldListener;
 import me.mastergamercz.bedwars.managers.*;
@@ -65,10 +66,10 @@ public class Main extends JavaPlugin {
     private WorldUtils worldUtils;
     private ArrayList<Location> villagers = new ArrayList<Location>();
     private ArrayList<UUID> admins = new ArrayList<UUID>();
-    private ItemShop itemShop;
     private RestartGameTask restartGameTask;
     private GameStatus gameStatus;
     private ArrayList<Location> placedBlocks = new ArrayList<Location>();
+    private ArrayList<UUID> vulnerable = new ArrayList<UUID>();
 
     public void onEnable() {
          configManager = new ConfigManager(this);
@@ -83,20 +84,15 @@ public class Main extends JavaPlugin {
          this.databaseManager = new DatabaseManager(this);
          this.statsManager = new StatsManager(this);
          this.worldUtils = new WorldUtils();
-         this.itemShop = new ItemShop(this);
-
 
          motd = configManager.getConfig("config.yml").getBoolean("enableMotd", true);
          setGameStatus(GameStatus.LOBBY);
-
          setPrefix(ChatColor.translateAlternateColorCodes('&', getConfigManager().getConfig("messages.yml").getString("prefix")));
          databaseManager.setup();
-         itemShop.init();
 
          registerCommands();
          registerListeners();
          reset();
-
     }
 
     public void reset() {
@@ -154,6 +150,7 @@ public class Main extends JavaPlugin {
         pm.registerEvents(new WorldListener(this),this);
         pm.registerEvents(new ChatListener(this),this);
         pm.registerEvents(new EntityListener(this),this);
+        pm.registerEvents(new MenuListeners(),this);
     }
 
     public void startGame() {
@@ -398,15 +395,15 @@ public class Main extends JavaPlugin {
         return soundManager;
     }
 
-    public ItemShop getItemShop() {
-        return itemShop;
-    }
-
     public ArrayList<UUID> getAdmins() {
         return admins;
     }
 
     public ArrayList<Location> getPlacedBlocks() {
         return placedBlocks;
+    }
+
+    public ArrayList<UUID> getVulnerable() {
+        return vulnerable;
     }
 }
