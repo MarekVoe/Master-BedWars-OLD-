@@ -1,7 +1,6 @@
 package me.mastergamercz.bedwars.listeners;
 
 import me.mastergamercz.bedwars.Main;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +18,7 @@ public class WorldListener implements Listener {
 
     @EventHandler
     public void onMobSpawn(CreatureSpawnEvent e){
-        if (e.getEntity().getType().equals(EntityType.VILLAGER)) {
+        if (e.getEntity().getType().equals(EntityType.VILLAGER) || e.getEntity().getType().equals(EntityType.ARMOR_STAND)) {
             e.setCancelled(false);
         } else {
             e.setCancelled(true);

@@ -9,9 +9,7 @@ import me.mastergamercz.bedwars.enums.GameStatus;
 import me.mastergamercz.bedwars.enums.GenType;
 import me.mastergamercz.bedwars.enums.StatType;
 import me.mastergamercz.bedwars.enums.Team;
-import me.mastergamercz.bedwars.gens.Bronze_ItemGenerator;
-import me.mastergamercz.bedwars.gens.Gold_ItemGenerator;
-import me.mastergamercz.bedwars.gens.Iron_ItemGenerator;
+import me.mastergamercz.bedwars.gens.Generator;
 import me.mastergamercz.bedwars.listeners.EntityListener;
 import me.mastergamercz.bedwars.listeners.MenuListeners;
 import me.mastergamercz.bedwars.listeners.PlayerListener;
@@ -24,21 +22,16 @@ import me.mastergamercz.bedwars.utils.Util;
 import me.mastergamercz.bedwars.utils.WorldUtils;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
 
 import java.io.File;
 import java.io.IOException;
@@ -266,7 +259,8 @@ public class Main extends JavaPlugin {
     public void loadBronzes(Set<Location> bronzeLocations) {
          for (Location loc : bronzeLocations) {
              bronzes.add(loc);
-             new Bronze_ItemGenerator(this, GenType.BRONZE, 2, loc).runTaskTimer(this, 0, 1);
+             Generator gen = new Generator(this, loc, GenType.BRONZE);
+             gen.startGenerator();
          }
     }
 
@@ -282,14 +276,16 @@ public class Main extends JavaPlugin {
     public void loadIrons(Set<Location> ironLocations) {
         for (Location loc : ironLocations) {
            irons.add(loc);
-            new Iron_ItemGenerator(this, GenType.IRON, 10, loc).runTaskTimer(this, 0,1);
+           Generator gen = new Generator(this, loc, GenType.IRON);
+           gen.startGenerator();
         }
     }
 
     public void loadGolds(Set<Location> goldLocations) {
         for (Location loc : goldLocations) {
             golds.add(loc);
-            new Gold_ItemGenerator(this, GenType.GOLD, 30, loc).runTaskTimer(this, 0, 1);
+            Generator gen = new Generator(this, loc, GenType.GOLD);
+            gen.startGenerator();
         }
     }
 
