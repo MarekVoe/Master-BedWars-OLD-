@@ -1,2 +1,3 @@
 # Master-BedWars
-BedWars minigame plugin by mastergamerCz.
+BedWars minigame plugin by MarekVoe.
+To be reworked...
